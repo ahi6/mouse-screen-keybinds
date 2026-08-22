@@ -18,7 +18,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"screen-secondary" {
+		"mouse-screen-keybinds" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

@@ -10,4 +10,4 @@ pluginManagement {
 }
 
 // Should match your modid
-rootProject.name = 'screen-secondary'
+rootProject.name = 'mouse-screen-keybinds'

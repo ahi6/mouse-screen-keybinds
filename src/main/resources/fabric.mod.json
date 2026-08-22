@@ -1,34 +1,24 @@
 {
 	"schemaVersion": 1,
-	"id": "screen-secondary",
+	"id": "mouse-screen-keybinds",
 	"version": "${version}",
-	"name": "Screen Secondary",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Mouse Screen Keybinds",
+	"description": "Allows clicking the menus with the keyboard",
 	"authors": [
-		"Me!"
+		"ahi6"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/ahi6/mouse-screen-keybinds",
+		"sources": "https://github.com/ahi6/mouse-screen-keybinds"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/screen-secondary/icon.png",
+	"license": "EUPL-1.2",
+	"icon": "assets/mouse-screen-keybinds/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"dev.pages.ahi.screen_secondary.ScreenSecondary"
-		],
 		"client": [
-			"dev.pages.ahi.screen_secondary.client.ScreenSecondaryClient"
+			"dev.pages.ahi.mouse_screen_keybinds.client.MouseScreenKeybindsClient"
 		]
 	},
-	"mixins": [
-		"screen-secondary.mixins.json",
-		{
-			"config": "screen-secondary.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.2",
