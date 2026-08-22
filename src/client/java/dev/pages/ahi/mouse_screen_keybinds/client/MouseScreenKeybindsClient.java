@@ -1,7 +1,6 @@
-package dev.pages.ahi.screen_secondary.client;
+package dev.pages.ahi.mouse_screen_keybinds.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.pages.ahi.screen_secondary.ScreenSecondary;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -14,36 +13,40 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static dev.pages.ahi.screen_secondary.ScreenSecondary.LOGGER;
+public class MouseScreenKeybindsClient implements ClientModInitializer {
+    private static final String MOD_ID = "mouse-screen-keybinds";
 
-public class ScreenSecondaryClient implements ClientModInitializer {
-    public static KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-            Identifier.fromNamespaceAndPath(ScreenSecondary.MOD_ID, "screen_mouse_buttons")
+    private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
+            Identifier.fromNamespaceAndPath(MouseScreenKeybindsClient.MOD_ID, "screen_mouse_buttons")
     );
 
-    public static KeyMapping KM_MOUSE_0 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_0 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.screen-secondary.screen_mouse0",
                     InputConstants.Type.KEYSYM,
                     GLFW.GLFW_KEY_Z,
-                    ScreenSecondaryClient.CATEGORY
+                    MouseScreenKeybindsClient.CATEGORY
             ));
 
-    public static KeyMapping KM_MOUSE_1 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_1 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.screen-secondary.screen_mouse1",
                     InputConstants.Type.KEYSYM,
                     GLFW.GLFW_KEY_X,
-                    ScreenSecondaryClient.CATEGORY
+                    MouseScreenKeybindsClient.CATEGORY
             ));
 
-    public static KeyMapping KM_MOUSE_2 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_2 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.screen-secondary.screen_mouse2",
                     InputConstants.Type.KEYSYM,
                     GLFW.GLFW_KEY_V,
-                    ScreenSecondaryClient.CATEGORY
+                    MouseScreenKeybindsClient.CATEGORY
             ));
 
     private static final KeyMapping[] MOUSE_KEYMAPS = {KM_MOUSE_0, KM_MOUSE_1, KM_MOUSE_2};
@@ -70,7 +73,6 @@ public class ScreenSecondaryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             ScreenKeyboardEvents.beforeKeyPress(screen).register((currentScreen, event) -> this.handleKeyEvent(client, scaledWidth, scaledHeight, currentScreen, event, false));
             ScreenKeyboardEvents.beforeKeyRelease(screen).register((currentScreen, event) -> this.handleKeyEvent(client, scaledWidth, scaledHeight, currentScreen, event, true));
