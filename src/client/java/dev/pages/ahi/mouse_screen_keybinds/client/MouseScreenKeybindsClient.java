@@ -12,6 +12,8 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,9 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
 
     private static final KeyMapping[] MOUSE_KEYMAPS = {KM_MOUSE_0, KM_MOUSE_1, KM_MOUSE_2};
 
+    Long lastClickMillis = null;
+    Integer lastButtonIdx = null;
+
     private void handleKeyEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen, KeyEvent event, boolean released) {
         for (int buttonIdx = 0; buttonIdx < MOUSE_KEYMAPS.length; buttonIdx++) {
             if (MOUSE_KEYMAPS[buttonIdx].matches(event)) {
@@ -65,7 +70,14 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 if (released) {
                     screen.mouseReleased(mbe);
                 } else {
-                    screen.mouseClicked(mbe, false);
+                    long currentTime = Util.getMillis();
+                    boolean doubleClick = this.lastButtonIdx != null
+                            && Util.getMillis() - this.lastClickMillis < 250L
+                            && this.lastButtonIdx == buttonIdx;
+
+                    this.lastClickMillis = currentTime;
+                    this.lastButtonIdx = buttonIdx;
+                    screen.mouseClicked(mbe, doubleClick);
                 }
             }
         }
