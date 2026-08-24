@@ -80,10 +80,11 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     this.isIdxClicking[buttonIdx] = true;
                     this.lastButtonIdx = buttonIdx;
                     this.lastClickMillis = currentTime;
+
+                    this.lastMouseX = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
+                    this.lastMouseY = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
                 }
 
-                lastMouseX = mbe.x();
-                lastMouseY = mbe.y();
             }
         }
     }
@@ -94,15 +95,18 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 // dragging
                 MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
 
-                double dx = mbe.x() - lastMouseX;
-                double dy = mbe.y() - lastMouseY;
+                double curMouseX = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
+                double curMouseY = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
 
-                screen.mouseDragged(mbe, dx, dy); // TODO: buggy
+                double dx = curMouseX - lastMouseX;
+                double dy = curMouseY - lastMouseY;
+
+                screen.mouseDragged(mbe, dx, dy);
 
                 LOGGER.debug("Dragged: idx {}, dx:dy {}:{}", buttonIdx, dx, dy);
 
-                lastMouseX = mbe.x();
-                lastMouseY = mbe.y();
+                this.lastMouseX = curMouseX;
+                this.lastMouseY = curMouseY;
             }
         }
 
