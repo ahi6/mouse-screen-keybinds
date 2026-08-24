@@ -1,0 +1,6 @@
+{
+  "key.mouse-screen-keybinds.screen_mouse0": "GUI mouse primary",
+  "key.mouse-screen-keybinds.screen_mouse1": "GUI mouse secondary",
+  "key.mouse-screen-keybinds.screen_mouse2": "GUI mouse middle",
+  "key.category.mouse-screen-keybinds.screen_mouse_buttons": "Mouse GUI screen keybinds"
+}

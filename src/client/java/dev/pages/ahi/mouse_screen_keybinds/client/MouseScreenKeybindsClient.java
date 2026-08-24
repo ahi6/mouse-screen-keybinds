@@ -28,25 +28,25 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
 
     private static final KeyMapping KM_MOUSE_0 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
-                    "key.screen-secondary.screen_mouse0",
+                    "key.mouse-screen-keybinds.screen_mouse0",
                     InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_Z,
+                    GLFW.GLFW_KEY_UNKNOWN,
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
     private static final KeyMapping KM_MOUSE_1 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
-                    "key.screen-secondary.screen_mouse1",
+                    "key.mouse-screen-keybinds.screen_mouse1",
                     InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_X,
+                    GLFW.GLFW_KEY_UNKNOWN,
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
     private static final KeyMapping KM_MOUSE_2 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
-                    "key.screen-secondary.screen_mouse2",
+                    "key.mouse-screen-keybinds.screen_mouse2",
                     InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_V,
+                    GLFW.GLFW_KEY_UNKNOWN,
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
