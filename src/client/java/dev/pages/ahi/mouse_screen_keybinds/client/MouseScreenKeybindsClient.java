@@ -55,17 +55,15 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
     Long lastClickMillis = null;
     Integer lastButtonIdx = null;
     boolean[] isIdxClicking = {false, false, false};
+    double lastMouseX = 0;
+    double lastMouseY = 0;
 
     private void handleKeyEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen, KeyEvent event, boolean released) {
         for (int buttonIdx = 0; buttonIdx < MOUSE_KEYMAPS.length; buttonIdx++) {
             if (MOUSE_KEYMAPS[buttonIdx].matches(event)) {
                 LOGGER.debug("Event: {} ({})", event, released ? "Released" : "Pressed");
 
-                double mouse_X = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
-                double mouse_Y = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
-
-                MouseButtonInfo mbi = new MouseButtonInfo(buttonIdx, client.hasShiftDown() ? 1 : 0);
-                MouseButtonEvent mbe = new MouseButtonEvent(mouse_X, mouse_Y, mbi);
+                MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
 
                 if (released) {
                     screen.mouseReleased(mbe);
@@ -82,11 +80,42 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     this.isIdxClicking[buttonIdx] = true;
                     this.lastButtonIdx = buttonIdx;
                     this.lastClickMillis = currentTime;
-                } else {
-                    screen.mouseDragged(mbe, mouse_X, mouse_Y);
                 }
+
+                lastMouseX = mbe.x();
+                lastMouseY = mbe.y();
             }
         }
+    }
+
+    private void handleTickEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen) {
+        for (int buttonIdx = 0; buttonIdx < MOUSE_KEYMAPS.length; buttonIdx++) {
+            if (this.isIdxClicking[buttonIdx]) {
+                // dragging
+                MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
+
+                double dx = mbe.x() - lastMouseX;
+                double dy = mbe.y() - lastMouseY;
+
+                screen.mouseDragged(mbe, dx, dy); // TODO: buggy
+
+                LOGGER.debug("Dragged: idx {}, dx:dy {}:{}", buttonIdx, dx, dy);
+
+                lastMouseX = mbe.x();
+                lastMouseY = mbe.y();
+            }
+        }
+
+    }
+
+    private MouseButtonEvent mouseButtonEventHelper(int buttonIdx, Minecraft client, int scaledWidth, int scaledHeight) {
+        double mouse_X = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
+        double mouse_Y = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
+
+        MouseButtonInfo mbi = new MouseButtonInfo(buttonIdx, client.hasShiftDown() ? 1 : 0);
+        MouseButtonEvent mbe = new MouseButtonEvent(mouse_X, mouse_Y, mbi);
+
+        return mbe;
     }
 
     @Override
@@ -94,6 +123,8 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             ScreenKeyboardEvents.beforeKeyPress(screen).register((currentScreen, event) -> this.handleKeyEvent(client, scaledWidth, scaledHeight, currentScreen, event, false));
             ScreenKeyboardEvents.beforeKeyRelease(screen).register((currentScreen, event) -> this.handleKeyEvent(client, scaledWidth, scaledHeight, currentScreen, event, true));
+
+            ScreenEvents.beforeTick(screen).register((currentScreen) -> this.handleTickEvent(client, scaledWidth, scaledHeight, currentScreen));
         });
     }
 }
