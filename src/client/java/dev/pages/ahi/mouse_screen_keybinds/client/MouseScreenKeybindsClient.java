@@ -81,8 +81,8 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     this.lastButtonIdx = buttonIdx;
                     this.lastClickMillis = currentTime;
 
-                    this.lastMouseX = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
-                    this.lastMouseY = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
+                    this.lastMouseX = mbe.x();
+                    this.lastMouseY = mbe.y();
                 }
 
             }
@@ -95,8 +95,8 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 // dragging
                 MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
 
-                double curMouseX = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
-                double curMouseY = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
+                double curMouseX = mbe.x();
+                double curMouseY = mbe.y();
 
                 double dx = curMouseX - lastMouseX;
                 double dy = curMouseY - lastMouseY;
