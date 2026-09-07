@@ -2,6 +2,7 @@
 
 [![build](https://github.com/ahi6/mouse-screen-keybinds/actions/workflows/build.yml/badge.svg)](https://github.com/ahi6/mouse-screen-keybinds/actions/workflows/build.yml)
 ![Modrinth Downloads](https://img.shields.io/modrinth/dt/mouse-screen-keybinds)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ahi6/mouse-screen-keybinds/total)
 
 
 Fabric mod allowing to bind keyboard buttons to GUI clicks. It supports triggering the primary, secondary or middle mouse button in menus using the keyboard.
