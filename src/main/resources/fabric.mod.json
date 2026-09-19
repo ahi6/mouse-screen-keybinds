@@ -19,6 +19,12 @@
 			"dev.pages.ahi.mouse_screen_keybinds.client.MouseScreenKeybindsClient"
 		]
 	},
+	"mixins": [
+	{
+		"config": "mouse_screen_keybinds.client.mixins.json",
+		"environment": "client"
+	}
+	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.3",

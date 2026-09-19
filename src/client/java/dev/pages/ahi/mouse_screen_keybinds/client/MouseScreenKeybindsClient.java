@@ -1,6 +1,7 @@
 package dev.pages.ahi.mouse_screen_keybinds.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.pages.ahi.mouse_screen_keybinds.client.mixin.KeyMappingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -99,11 +100,13 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
     }
 
     private void handleTickEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen) {
-        for (int buttonIdx : MOUSE_KEYMAPS.values()) {
+        MOUSE_KEYMAPS.forEach((keymap, buttonIdx) -> {
             if (this.isIdxClicking.getOrDefault(buttonIdx, false)) {
                 // manually query if it has been released, since Minecraft's SDL3 backend does not send release events
                 // via Fabric API when loading into a world, for example
-                if (!InputConstants.isKeyDown(buttonIdx)) {
+                final int k = ((KeyMappingAccessor) keymap).mouse_screen_keybinds$getKey().getValue();
+                if (!InputConstants.isKeyDown(k)) {
+                    LOGGER.debug("Clearing held button {}", buttonIdx);
                     this.isIdxClicking.put(buttonIdx, false);
                     return;
                 }
@@ -124,7 +127,7 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 this.lastMouseX = curMouseX;
                 this.lastMouseY = curMouseY;
             }
-        }
+        });
     }
 
     private MouseButtonEvent mouseButtonEventHelper(int buttonIdx, Minecraft client, int scaledWidth, int scaledHeight) {
