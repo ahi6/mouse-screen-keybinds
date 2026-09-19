@@ -13,7 +13,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,24 +28,24 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
     private static final KeyMapping KM_MOUSE_0 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse0",
-                    InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_UNKNOWN,
+                    InputConstants.Type.KEYBOARD,
+                    InputConstants.UNKNOWN.getValue(),
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
     private static final KeyMapping KM_MOUSE_1 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse1",
-                    InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_UNKNOWN,
+                    InputConstants.Type.KEYBOARD,
+                    InputConstants.UNKNOWN.getValue(),
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
     private static final KeyMapping KM_MOUSE_2 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse2",
-                    InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_UNKNOWN,
+                    InputConstants.Type.KEYBOARD,
+                    InputConstants.UNKNOWN.getValue(),
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
