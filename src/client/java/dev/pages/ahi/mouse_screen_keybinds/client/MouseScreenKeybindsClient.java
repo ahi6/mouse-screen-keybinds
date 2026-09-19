@@ -16,6 +16,9 @@ import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MouseScreenKeybindsClient implements ClientModInitializer {
     private static final String MOD_ID = "mouse-screen-keybinds";
 
@@ -25,7 +28,7 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
             Identifier.fromNamespaceAndPath(MouseScreenKeybindsClient.MOD_ID, "screen_mouse_buttons")
     );
 
-    private static final KeyMapping KM_MOUSE_0 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_PRIMARY = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse0",
                     InputConstants.Type.KEYBOARD,
@@ -33,7 +36,7 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
-    private static final KeyMapping KM_MOUSE_1 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_SECONDARY = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse1",
                     InputConstants.Type.KEYBOARD,
@@ -41,7 +44,7 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
-    private static final KeyMapping KM_MOUSE_2 = KeyMappingHelper.registerKeyMapping(
+    private static final KeyMapping KM_MOUSE_MIDDLE = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.mouse-screen-keybinds.screen_mouse2",
                     InputConstants.Type.KEYBOARD,
@@ -49,17 +52,25 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                     MouseScreenKeybindsClient.CATEGORY
             ));
 
-    private static final KeyMapping[] MOUSE_KEYMAPS = {KM_MOUSE_0, KM_MOUSE_1, KM_MOUSE_2};
+    private static final Map<KeyMapping, Integer> MOUSE_KEYMAPS = Map.of(
+            KM_MOUSE_PRIMARY, InputConstants.MOUSE_BUTTON_LEFT,
+            KM_MOUSE_SECONDARY, InputConstants.MOUSE_BUTTON_RIGHT,
+            KM_MOUSE_MIDDLE, InputConstants.MOUSE_BUTTON_MIDDLE
+    );
+
 
     Long lastClickMillis = null;
     Integer lastButtonIdx = null;
-    boolean[] isIdxClicking = {false, false, false};
+
+    HashMap<Integer, Boolean> isIdxClicking = new HashMap<>();
     double lastMouseX = 0;
     double lastMouseY = 0;
 
     private void handleKeyEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen, KeyEvent event, boolean released) {
-        for (int buttonIdx = 0; buttonIdx < MOUSE_KEYMAPS.length; buttonIdx++) {
-            if (MOUSE_KEYMAPS[buttonIdx].matches(event)) {
+
+        for (KeyMapping keymap : MOUSE_KEYMAPS.keySet()) {
+            if (keymap.matches(event)) {
+                int buttonIdx = MOUSE_KEYMAPS.get(keymap);
                 LOGGER.debug("Event: {} ({})", event, released ? "Released" : "Pressed");
 
                 MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
@@ -67,8 +78,8 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 if (released) {
                     screen.mouseReleased(mbe);
 
-                    this.isIdxClicking[buttonIdx] = false;
-                } else if (!this.isIdxClicking[buttonIdx]){
+                    this.isIdxClicking.put(buttonIdx, false);
+                } else if (!this.isIdxClicking.getOrDefault(buttonIdx, false)){
                     long currentTime = Util.getMillis();
                     boolean doubleClick = this.lastButtonIdx != null
                             && currentTime - this.lastClickMillis < 250L
@@ -76,21 +87,27 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
 
                     screen.mouseClicked(mbe, doubleClick);
 
-                    this.isIdxClicking[buttonIdx] = true;
+                    this.isIdxClicking.put(buttonIdx, true);
                     this.lastButtonIdx = buttonIdx;
                     this.lastClickMillis = currentTime;
 
                     this.lastMouseX = mbe.x();
                     this.lastMouseY = mbe.y();
                 }
-
             }
         }
     }
 
     private void handleTickEvent(Minecraft client, int scaledWidth, int scaledHeight, Screen screen) {
-        for (int buttonIdx = 0; buttonIdx < MOUSE_KEYMAPS.length; buttonIdx++) {
-            if (this.isIdxClicking[buttonIdx]) {
+        for (int buttonIdx : MOUSE_KEYMAPS.values()) {
+            if (this.isIdxClicking.getOrDefault(buttonIdx, false)) {
+                // manually query if it has been released, since Minecraft's SDL3 backend does not send release events
+                // via Fabric API when loading into a world, for example
+                if (!InputConstants.isKeyDown(buttonIdx)) {
+                    this.isIdxClicking.put(buttonIdx, false);
+                    return;
+                }
+
                 // dragging
                 MouseButtonEvent mbe = this.mouseButtonEventHelper(buttonIdx, client, scaledWidth, scaledHeight);
 
@@ -108,7 +125,6 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
                 this.lastMouseY = curMouseY;
             }
         }
-
     }
 
     private MouseButtonEvent mouseButtonEventHelper(int buttonIdx, Minecraft client, int scaledWidth, int scaledHeight) {
@@ -116,9 +132,7 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
         double mouse_Y = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
 
         MouseButtonInfo mbi = new MouseButtonInfo(buttonIdx, client.hasShiftDown() ? 1 : 0);
-        MouseButtonEvent mbe = new MouseButtonEvent(mouse_X, mouse_Y, mbi);
-
-        return mbe;
+        return new MouseButtonEvent(mouse_X, mouse_Y, mbi);
     }
 
     @Override
