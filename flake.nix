@@ -9,6 +9,9 @@
       buildInputs = [ pkgs.jdk25 ];
       LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
         pkgs.vulkan-loader
+        pkgs.wayland
+        pkgs.libxkbcommon
+        pkgs.libdecor
         pkgs.libGL
         pkgs.openal
         pkgs.libpulseaudio
@@ -19,6 +22,9 @@
         pkgs.libXi
         pkgs.libXext
       ];
+      shellHook = ''
+        export SDL_VIDEODRIVER="wayland"
+      '';
     };
   };
 }
