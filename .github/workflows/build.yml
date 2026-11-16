@@ -1,32 +1,55 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
-
 name: build
-on: [pull_request, push, workflow_dispatch]
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'shell.nix'
+      - '.envrc'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'shell.nix'
+      - '.envrc'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
+
       - name: setup jdk
         uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: publish build artifacts
-        if: github.event_name == 'workflow_dispatch'
-        uses: Kira-NT/mc-publish@v3
+
+      - name: setup gradle & cache
+        uses: gradle/actions/setup-gradle@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: build
+        run: ./gradlew build --build-cache
+
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Artifacts
+          path: build/libs/*.jar
+          retention-days: 7
+          if-no-files-found: error

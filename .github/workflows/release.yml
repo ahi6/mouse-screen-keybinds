@@ -1,0 +1,42 @@
+name: publish release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release version tag'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: build
+        run: ./gradlew build --build-cache
+
+      - name: publish mod
+        uses: Kira-NT/mc-publish@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: Add Modrinth & CurseForge tokens when ready:
+          # modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          # curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
