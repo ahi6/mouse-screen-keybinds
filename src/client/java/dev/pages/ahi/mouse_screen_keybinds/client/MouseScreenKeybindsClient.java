@@ -131,8 +131,8 @@ public class MouseScreenKeybindsClient implements ClientModInitializer {
     }
 
     private MouseButtonEvent mouseButtonEventHelper(int buttonIdx, Minecraft client, int scaledWidth, int scaledHeight) {
-        double mouse_X = client.mouseHandler.xpos() * (double) scaledWidth / client.getWindow().getWidth();
-        double mouse_Y = client.mouseHandler.ypos() * (double) scaledHeight / client.getWindow().getHeight();
+        double mouse_X = client.mouseHandler.getScaledXPos(client.getWindow());
+        double mouse_Y = client.mouseHandler.getScaledYPos(client.getWindow());
 
         MouseButtonInfo mbi = new MouseButtonInfo(buttonIdx, client.hasShiftDown() ? 1 : 0);
         return new MouseButtonEvent(mouse_X, mouse_Y, mbi);
